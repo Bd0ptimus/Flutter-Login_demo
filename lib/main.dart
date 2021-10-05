@@ -7,7 +7,8 @@ import 'auth.dart';
 import 'root_page.dart';
 
 void main() async{
-  //await Firebase.initializeApp();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 

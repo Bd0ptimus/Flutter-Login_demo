@@ -37,7 +37,6 @@ class _LoginPageState extends State<LoginPage>{
   }
 
   void ValidateAndSubmit() async{
-    await Firebase.initializeApp();
     if(ValidateAndSave()) {
       try{
         if (_formType==FormType.login){
