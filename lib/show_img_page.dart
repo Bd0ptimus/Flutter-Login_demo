@@ -25,11 +25,10 @@ class _ShowImgPageState extends State<ShowImgPage> {
   @override
   void initState(){
     super.initState();
-    final userId = FirebaseAuth.instance.currentUser?.uid;
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
     print('User Id : $userId');
-    futureFiles=FirebaseApi.listAll('$userId/Uploads');
+    futureFiles=FirebaseApi.listAll(userId! , 'Uploads');
   }
-
 
   Widget buildFile(BuildContext context , FirebaseFile file)=> ListTile(
     leading: Image.network(

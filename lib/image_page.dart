@@ -20,7 +20,7 @@ class ImagePage extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () async{
-                await FirebaseApi.downloadFile(file.ref);
+                await FirebaseApi.downloadFile(file.name);
                 final snackBar = SnackBar(
                   content: Text('Downloaded ${file.name}'),
                 );

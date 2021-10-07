@@ -85,20 +85,12 @@ class _HomePageState extends State<HomePage> {
     setState(() => file=listPath);
   }
 
-  int countFiles(String path) {
-    QuerySnapshot _myDoc = FirebaseFirestore.instance.doc(path) as QuerySnapshot<Object?>;
-    List<DocumentSnapshot> _myDocCount = _myDoc.docs;
-    return _myDocCount.length;
-  }
-
   Future UploadFile() async{
     if(file.isEmpty) return;
     String userId = await widget.auth.currentUser();
     for(var i=0;i<listPath.length;i++){
       final destination = '$userId/Uploads/$i';
-      int numberFiles= countFiles('$userId');
-      //print('Number files in Firebase : $numberFiles');
-      FirebaseApi.uploadFile(destination, listPath[i]!);
+      FirebaseApi.uploadFile(userId,'Uploads', listPath[i]!);
       final fileName=basename(listPath[i]!.path);
       print('ready to upload file : $fileName');
     }
