@@ -44,7 +44,7 @@ class FirebaseApi{
         'number of files' : fileIndex,
         'url_'+'$nameNewFile' : downloadURL
       })
-          .then((value) => print('User Added'))
+          .then((value) =>  listAll(userId, typeUpload))
           .catchError((error) => print('Updload Failed'));
     }
   }

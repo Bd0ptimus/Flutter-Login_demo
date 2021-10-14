@@ -21,13 +21,13 @@ class ShowImgPage extends StatefulWidget {
 
 class _ShowImgPageState extends State<ShowImgPage> {
 
-  late Future<List<FirebaseFile>>futureFiles;
+  late Stream<List<FirebaseFile>>futureFiles;
   @override
   void initState(){
     super.initState();
     String? userId = FirebaseAuth.instance.currentUser?.uid;
     print('User Id : $userId');
-    futureFiles=FirebaseApi.listAll(userId! , 'Uploads');
+    futureFiles=Stream.fromFuture(FirebaseApi.listAll(userId! , 'Uploads') );
   }
 
   Widget buildFile(BuildContext context , FirebaseFile file)=> ListTile(
@@ -85,8 +85,8 @@ class _ShowImgPageState extends State<ShowImgPage> {
                 child: new Text('Back', style: new TextStyle(color: Colors.white)))
           ],
         ),
-        body: FutureBuilder<List<FirebaseFile>>(
-          future: futureFiles,
+        body: StreamBuilder<List<FirebaseFile>>(
+          stream: futureFiles,
           builder: (context, snapshot){
             switch (snapshot.connectionState){
               case ConnectionState.waiting:
