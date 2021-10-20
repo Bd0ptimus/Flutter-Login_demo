@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/form.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:login_demo/config.dart';
+import 'package:login_demo/services/login_request.dart';
 import 'auth.dart';
 
 
@@ -23,6 +25,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage>{
   String _email ="";
   String _password="";
+  String _error ="";
   FormType _formType=FormType.login;
   final formKey = new GlobalKey<FormState>();
 
@@ -36,17 +39,55 @@ class _LoginPageState extends State<LoginPage>{
     }
   }
 
+  String? checkResponse(String response){
+    switch(response){
+      case "111":
+        return "This user has existed";
+      case "112":
+        return "Have error when create account";
+      case "121":
+        return "No user found";
+      case "122":
+        return "Wrong password";
+      case"131":
+        return "Error in posting";
+      case"132" :
+        return "Error occur by server";
+    }
+    writeID(response[0]);
+    writeCookie(response[1]);
+    return "1";
+  }
+
   void ValidateAndSubmit() async{
     if(ValidateAndSave()) {
       try{
+        String result;
         if (_formType==FormType.login){
-          String userId = await widget.auth.signInWithEmailAndPassword( _email, _password);
-          print('signed in: $userId');
+          //String userId = await widget.auth.signInWithEmailAndPassword( _email, _password);
+          //print('signed in: $userId');
+          result = await DatabaseRequest(
+              email: _email,
+              password: _password
+          ).requestSignin();
+          print('After request sign in: $result');
         }else{
-          String userId = await widget.auth.createUserWithEmailAndPassword(_email,_password);
-          print('register user: $userId');
+          //String userId = await widget.auth.createUserWithEmailAndPassword(_email,_password);
+          //print('register user: $userId');
+          result = await DatabaseRequest(
+            email: _email,
+            password: _password
+          ).requestCreate();
+          print('After request create account : $result');
         }
-        widget.onSignedIn();
+        String? resultAfterCheckResponse = checkResponse(result);
+        print('result after check response : $resultAfterCheckResponse');
+        if(resultAfterCheckResponse == "1"){
+          _error="";
+          widget.onSignedIn();
+        }else{
+          _error = resultAfterCheckResponse!;
+        }
       }catch(e){
         print('Error: $e');
       }
@@ -118,7 +159,8 @@ class _LoginPageState extends State<LoginPage>{
     ];
   }
 
-  List<Widget>buildSubmitButton() {
+
+  List<Widget>buildSubmitButton() { //Log in step
     if(_formType==FormType.login) {
       return[
         new RaisedButton(
@@ -130,7 +172,7 @@ class _LoginPageState extends State<LoginPage>{
           child: new Text('Create an account', style: new TextStyle(fontSize:20)),
         )
       ];
-    }else{
+    }else{ // Register step
       return[
         new RaisedButton(
           child: new Text('Create an account', style: new TextStyle(fontSize: 20)),
@@ -143,5 +185,13 @@ class _LoginPageState extends State<LoginPage>{
       ];
     }
 
+  }
+
+  List<Widget>buildTextError(){
+    return [
+      new Container(
+        child: new Text(_error, style: new TextStyle(fontSize: 15),),
+      ),
+    ];
   }
 }

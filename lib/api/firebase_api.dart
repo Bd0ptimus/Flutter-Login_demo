@@ -53,14 +53,14 @@ class FirebaseApi{
     var users = await FirebaseFirestore.instance.collection(userId)
         .doc(typeDoc)
         .get();
-    Map<String, dynamic>? data = users.data() as Map<String, dynamic>?;
-    int numberURL = data?['number of files'];
+    Map<String, dynamic> data = users.data() as Map<String, dynamic>;
+    int numberURL = data['number of files'];
     List<FirebaseFile>futureFile = [];
     for (var i = 1; i <= numberURL; i++) {
       String takeKeyIMG = 'url_IMG_' + '$i';
       String nameIMG = 'IMG_' + '$i';
       FirebaseFile file = new FirebaseFile(
-          name: nameIMG, url: data?[takeKeyIMG]);
+          name: nameIMG, url: data[takeKeyIMG]);
       futureFile.add(file);
     }
     for (var i = 1; i <= numberURL; i++) {

@@ -24,11 +24,13 @@ class _RootPageState extends State<RootPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     widget.auth.currentUser().then((userId){
       setState(() {
         authStatus=userId==null?AuthStatus.notSignedIn:AuthStatus.signedIn;
       });
     });
+
   }
 
   void _singedIn(){

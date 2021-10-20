@@ -1,9 +1,9 @@
+import 'dart:convert';
 import 'dart:ffi';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:login_demo/api/firebase_file.dart';
-
+import 'package:http/http.dart' as http;
 import 'home_page.dart';
 import 'package:flutter/material.dart';
 import 'api/firebase_api.dart';
@@ -20,14 +20,37 @@ class ShowImgPage extends StatefulWidget {
 }
 
 class _ShowImgPageState extends State<ShowImgPage> {
+  List<dynamic>? categoryList;
+  Future getDatas()async{
+    try{
+      final response = await http.get(Uri.parse("https://49c8-93-188-41-67.ngrok.io/return_img.php"));
+      print("prepare to convert :");
+      if(response.statusCode == 200){
+        setState((){
+          categoryList = json.decode(response.body);
+          print("category list : $categoryList");
+        });
+      }
+    }catch(e){
+      print('App error: $e');
+    }
 
-  late Stream<List<FirebaseFile>>futureFiles;
+  }
+
+  showImage(String image){
+    return Image.memory(base64Decode(image), width: 200, height: 100,);
+  }
+
+  //late Stream<List<FirebaseFile>>futureFiles;
   @override
   void initState(){
     super.initState();
+    /*
     String? userId = FirebaseAuth.instance.currentUser?.uid;
     print('User Id : $userId');
-    futureFiles=Stream.fromFuture(FirebaseApi.listAll(userId! , 'Uploads') );
+    futureFiles=Stream.fromFuture(FirebaseApi.listAll(userId! , 'Uploads') );*/
+    print('load 1 ');
+    getDatas();
   }
 
   Widget buildFile(BuildContext context , FirebaseFile file)=> ListTile(
@@ -85,36 +108,14 @@ class _ShowImgPageState extends State<ShowImgPage> {
                 child: new Text('Back', style: new TextStyle(color: Colors.white)))
           ],
         ),
-        body: StreamBuilder<List<FirebaseFile>>(
-          stream: futureFiles,
-          builder: (context, snapshot){
-            switch (snapshot.connectionState){
-              case ConnectionState.waiting:
-                return Center(child: CircularProgressIndicator(),);
-              default:
-                if(snapshot.hasError){
-                  return Center(child: Text('Some error occured!'));
-                }else{
-                  final files = snapshot.data!;
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      buildHeader(files.length),
-                      const SizedBox(height:12),
-                      Expanded(
-                          child: ListView.builder(
-                            itemCount: files.length,
-                            itemBuilder: (context,index){
-                                final file = files[index];
-                                return buildFile(context, file);
-                            },
-                          )
-                      )
-                    ],
-                  );
-                }
-            }
-          }
+        body: ListView.builder(
+          itemCount: categoryList?.length,
+          itemBuilder: (context,index){
+            return ListTile(
+              trailing: categoryList!=null ? showImage(categoryList![index]['img']) : null,
+              //trailing: showImage(categoryList![index]['img']),
+            );
+          },
         )
     );
   }
